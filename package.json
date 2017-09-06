@@ -1,0 +1,24 @@
+{
+  "name": "es8boiler",
+  "version": "1.0.0",
+  "description": "es8 boilerplate",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack --watch"
+  },
+  "keywords": [
+    "JavaScript",
+    "Es8",
+    "Boilerplate"
+  ],
+  "author": "esther",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.0",
+    "browser-sync": "^2.18.13",
+    "browser-sync-webpack-plugin": "^1.2.0",
+    "webpack": "^3.5.5"
+  }
+}
