@@ -1,0 +1,9 @@
+
+
+beatsArray[0] = {bass:1, kick:0};
+beatsArray[1] = {bass:1, kick:1};
+beatsArray[2] = {bass:0, kick:0};
+beatsArray[3] = {bass:0, kick:1};
+beatsArray[4] = {bass:0, kick:0};
+beatsArray[5] = {bass:1, kick:1};
+beatsArray[6] = {bass:1, kick:0};

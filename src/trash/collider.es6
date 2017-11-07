@@ -1,23 +1,10 @@
 
-import Player from "./player.es6";
-import Enemies from "./enemies.es6";
-
-
-class Controller {
+export default class Score{
     constructor(){
-        this.canvas = document.querySelector("#myCanvas");
-        this.context = this.canvas.getContext("2d");
-        
-        this.player = new Player();   
-
-        this.enemyController = new Enemies();
-        
-        this.score = 0;
-
-        this.refresh();
-        
+        this.props = {
+          score: 0;
+        };
     }
-
     collide(){
         this.enemyController.enemies.forEach(enemy => { //voor elke enemy meten 
             //als enemy x of y tussen player x of y en player x of y -radius: collision      
@@ -80,20 +67,4 @@ class Controller {
              }
          })
     }
-    
-    refresh(){
-
-        this.player.draw(this.context);
-        
-        this.collide();
-
-
-        window.requestAnimationFrame(() => { //elke animation frame de functie opnieuw uitvoeren
-            this.refresh();
-        })
-
-    }
-
 }
-
-var c = new Controller();
