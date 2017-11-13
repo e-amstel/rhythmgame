@@ -10,7 +10,10 @@ export default class EnemyEast{
           height: 10,
           color:this.randomColor(),
           vel: 2,
-          interval: 2000
+          direction: 2,
+        //  sound: new Audio('../sound/tambourinewithhit.mp3') //sounds from http://www.freesfx.co.uk
+                    
+          
           
         }
         this.props.y = this.props.y - this.props.height/2 ;

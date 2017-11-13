@@ -14,57 +14,55 @@ export default class Enemies {
         this.interval = 1000;
         //de interval per richting wordt nu bepaald door de Vel variabele
         //dat betekent dat de interval constant blijft
-        //hier zou een derde variabele aan toegevoegd kunnen worden 
+        //hier is een derde variabele aan toegevoegd
         //om een veranderende afstand tussen de blokjes te bepalen
-        this.snare = 30; //beginwaarde interval
-        this.snareStart = 30;
-        this.snareVel = 30; //toenemende waarde 
-        this.clap = 1200;
-        this.clapStart = 120;
-        this.clapVel = 120;
-        this.beat = 1000;
-        this.beatStart = 100;
-        this.beatVel = 100;
-        this.kick = 400;
-        this.kickStart = 90;        
-        this.kickVel = 90;
+        //de counter is 60 fps
+        this.north = 500; //beginwaarde interval
+        this.northStart = 100; //statische resetwaarde
+        this.northVel = 100; //toenemende waarde 
+        this.east = 1000;
+        this.eastStart = 120;
+        this.eastVel = 120;
+        this.south = 60;
+        this.southStart = 60;
+        this.southVel = 60;
+        this.west = 120;
+        this.westStart = 90;        
+        this.westVel = 90;
 
         this.counter = 0; 
         
-        this.songstart = true; //is het nummer al begonnen? op het moment nog niks mee gedaan maar geeft mogelijkheid tot het inbouwen van een start knop
-
         this.refresh();
         
     }
     newEnemy(){
-        if (this.songstart == true){
             window.requestAnimationFrame(() => { //animationframe is ong 60 fps
                 this.counter++; //een counter die elk frame 1 omhoog gaat
             })
             //wanneer de counter gelijk is aan de opgegeven intervalwaardes komt er een nieuwe enemy bij
             //de intervalwaarde verhoogd ook om de counter bij te houden
-            if (this.counter == this.snare){
+            if (this.counter == this.north){
                 this.enemies.push(new EnemyNorth(this.canvas.width));  
-                this.snare = this.snare+this.snareVel;
+                this.north = this.north+this.northVel;
             }
-            if (this.counter == this.clap){
+            if (this.counter == this.east){
                 this.enemies.push(new EnemyEast(this.canvas.height));  
-                this.clap = this.clap+this.clapVel;
+                this.east = this.east+this.eastVel;
             }            
-            if (this.counter == this.beat){
+            if (this.counter == this.south){
                 this.enemies.push(new EnemySouth(this.canvas.width));  
-                this.beat = this.beat+this.beatVel;
+                this.south = this.south+this.southVel;
             }            
-            if (this.counter == this.kick){
+            if (this.counter == this.west){
                 this.enemies.push(new EnemyWest(this.canvas.height));  
-                this.kick = this.kick+this.kickVel;
+                this.west = this.west+this.westVel;
             }
             if (this.counter == 4000){ 
                 this.counter = 0; //de counter reset naar 0
-                this.snare = this.snareStart; //zet elke 4 secondes (maat) de waardes terug naar de beginwaardes
-                this.clap = this.clapStart;
-                this.beat = this.beatStart;
-                this.kick = this.kickStart;
+                this.north = this.northStart; //zet elke 4 secondes (maat) de waardes terug naar de beginwaardes
+                this.east = this.eastStart;
+                this.south = this.southStart;
+                this.west = this.westStart;
             }
 
         }
@@ -85,7 +83,63 @@ export default class Enemies {
                enemy.props.width, 
                enemy.props.height);
        }
-
+    
+    collide(player, score){ //collide in enemies met parameter voor player en parameter voor de score
+        this.enemies.forEach(enemy => { //voor elke enemy meten 
+            //als enemy x of y tussen player x of y en player x of y -radius: collision      
+            //elke collisionwordt gemeten als meerdere collisions, 
+            //een exacte score zou dus berekend kunnen worden door het aantal collisions door 16 te delen    
+            //een eerlijke score (die in verhouding staat met de moeilijkheidsgraad) kan bereikt worden 
+            //door het delen van de collisions door de radius en dit af te ronden of te vermenigvuldigen met een standaard getal 
+            if (enemy.props.y > (player.props.y - player.props.r) && enemy.props.y < player.props.y && enemy.props.direction == 1){
+               //collide top
+                 //als juiste key ingedrukt
+                 if (player.props.keydown == 1){
+                     enemy.props.sound.play();
+                     enemy.props.isDead = true; //de enemy verdwijnt
+                     score++; //de score gaat omhoog
+                     //veld groter maken?
+                     //speel geluidje
+                 }
+                 else {
+                     //levens down?? geen levens omdat er een tijdsduur/maximale score op het nummer zit. 
+                 }    
+             }
+            if (enemy.props.x > (player.props.x - player.props.r) && enemy.props.x < player.props.x && enemy.props.direction == 4){
+                //collide left
+                 //als juiste key ingedrukt
+                 if (player.props.keydown == 4){
+                     enemy.props.sound.play();                     
+                     enemy.props.isDead = true;
+                     score++;
+                     
+                     //speel geluidje
+                 }
+             }
+            if (enemy.props.y < (player.props.y + player.props.r) && enemy.props.y > player.props.y && enemy.props.direction == 3){
+                // collide down
+                 //als juiste key ingedrukt
+                 if (player.props.keydown == 3){
+                     enemy.props.sound.play();                     
+                     enemy.props.isDead = true;
+                     score++;
+                     
+                     //speel geluidje
+                 }
+             }
+            if (enemy.props.x < (player.props.x + player.props.r) && enemy.props.x > player.props.x && enemy.props.direction == 2){
+                //collide right
+                 //als juiste key ingedrukt
+                 if (player.props.keydown == 2){
+                     enemy.props.sound.play();                    
+                     enemy.props.isDead = true;
+                     score++;
+                     
+                     //speel geluidje
+                 }
+             }
+         })
+    }
     
     refresh(){
         this.newEnemy();

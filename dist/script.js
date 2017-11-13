@@ -70,7 +70,11 @@
 "use strict";
 
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); //txt bestandjes van server mag ook
+//highscore wegschrijven
+//collide in enemies
+//ritme in array?
+//enemy.props.direction om te meten wat voor enemy het is
 
 var _player = __webpack_require__(1);
 
@@ -95,86 +99,28 @@ var Controller = function () {
 
         this.enemyController = new _enemies2.default();
 
+        this.songstart = true; //is het nummer al begonnen? op het moment nog niks mee gedaan maar geeft mogelijkheid tot het inbouwen van een start knop
+
         this.score = 0;
 
         this.refresh();
     }
 
     _createClass(Controller, [{
-        key: "collide",
-        value: function collide() {
-            var _this = this;
-
-            this.enemyController.enemies.forEach(function (enemy) {
-                //voor elke enemy meten 
-                //als enemy x of y tussen player x of y en player x of y -radius: collision      
-                //elke collision bij een radius van 40 wordt gemeten als 16 of 19 collisions, 
-                //een exacte score zou dus berekend kunnen worden door het aantal collisions door 16 te delen    
-                //een eerlijke score (die in verhouding staat met de moeilijkheidsgraad) kan bereikt worden 
-                //door het delen van de collisions door de radius en dit af te ronden of te vermenigvuldigen met een standaard getal 
-                if (enemy.props.y > _this.player.props.y - _this.player.props.r && enemy.props.y < _this.player.props.y) {
-                    //  console.log("collide top"); 
-                    //als juiste key ingedrukt
-                    if (_this.player.props.keydown == 1) {
-                        console.log("hit");
-                        //up score
-                        //if score up, veld groter maken
-                        //speel geluidje
-                    } else {
-                        console.log("miss");
-                        //levens down
-                    }
-                }
-                if (enemy.props.x > _this.player.props.x - _this.player.props.r && enemy.props.x < _this.player.props.x) {
-                    // console.log("collide left"); 
-                    //als juiste key ingedrukt
-                    if (_this.player.props.keydown == 2) {
-                        console.log("hit");
-                        //up score
-                        //speel geluidje
-                    } else {
-                        console.log("miss");
-                        //levens down
-                    }
-                }
-                if (enemy.props.y < _this.player.props.y + _this.player.props.r && enemy.props.y > _this.player.props.y) {
-                    // console.log("collide down");
-                    //als juiste key ingedrukt
-                    if (_this.player.props.keydown == 3) {
-                        console.log("hit");
-                        //up score
-                        //speel geluidje
-                    } else {
-                        console.log("miss");
-                        //levens down
-                    }
-                }
-                if (enemy.props.x < _this.player.props.x + _this.player.props.r && enemy.props.x > _this.player.props.x) {
-                    // console.log("collide right");
-                    //als juiste key ingedrukt
-                    if (_this.player.props.keydown == 4) {
-                        console.log("hit");
-                        //up score
-                        //speel geluidje
-                    } else {
-                        console.log("miss");
-                        //levens down
-                    }
-                }
-            });
-        }
-    }, {
         key: "refresh",
         value: function refresh() {
-            var _this2 = this;
+            var _this = this;
 
-            this.player.draw(this.context);
+            if (songstart == true) {
 
-            this.collide();
+                this.player.draw(this.context); //tekenen speler op canvas
+
+                this.enemyController.collide(this.player, this.score); //parameters voor PLAYER en SCORE
+            }
 
             window.requestAnimationFrame(function () {
                 //elke animation frame de functie opnieuw uitvoeren
-                _this2.refresh();
+                _this.refresh();
             });
         }
     }]);
@@ -280,360 +226,9 @@ exports.default = Player;
 
 /***/ }),
 /* 2 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _enemyNorth = __webpack_require__(3);
-
-var _enemyNorth2 = _interopRequireDefault(_enemyNorth);
-
-var _enemyEast = __webpack_require__(4);
-
-var _enemyEast2 = _interopRequireDefault(_enemyEast);
-
-var _enemySouth = __webpack_require__(5);
-
-var _enemySouth2 = _interopRequireDefault(_enemySouth);
-
-var _enemyWest = __webpack_require__(6);
-
-var _enemyWest2 = _interopRequireDefault(_enemyWest);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Enemies = function () {
-    function Enemies() {
-        _classCallCheck(this, Enemies);
-
-        this.canvas = document.querySelector("#myCanvas");
-        this.context = this.canvas.getContext("2d");
-
-        this.enemies = [];
-        this.lastPush = 0;
-        this.interval = 1000;
-        //de interval per richting wordt nu bepaald door de Vel variabele
-        //dat betekent dat de interval constant blijft
-        //hier zou een derde variabele aan toegevoegd kunnen worden 
-        //om een veranderende afstand tussen de blokjes te bepalen
-        this.snare = 30; //beginwaarde interval
-        this.snareStart = 30;
-        this.snareVel = 30; //toenemende waarde 
-        this.clap = 1200;
-        this.clapStart = 120;
-        this.clapVel = 120;
-        this.beat = 1000;
-        this.beatStart = 100;
-        this.beatVel = 100;
-        this.kick = 400;
-        this.kickStart = 90;
-        this.kickVel = 90;
-
-        this.counter = 0;
-
-        this.songstart = true; //is het nummer al begonnen? op het moment nog niks mee gedaan maar geeft mogelijkheid tot het inbouwen van een start knop
-
-        this.refresh();
-    }
-
-    _createClass(Enemies, [{
-        key: "newEnemy",
-        value: function newEnemy() {
-            var _this = this;
-
-            if (this.songstart == true) {
-                window.requestAnimationFrame(function () {
-                    //animationframe is ong 60 fps
-                    _this.counter++; //een counter die elk frame 1 omhoog gaat
-                });
-                //wanneer de counter gelijk is aan de opgegeven intervalwaardes komt er een nieuwe enemy bij
-                //de intervalwaarde verhoogd ook om de counter bij te houden
-                if (this.counter == this.snare) {
-                    this.enemies.push(new _enemyNorth2.default(this.canvas.width));
-                    this.snare = this.snare + this.snareVel;
-                }
-                if (this.counter == this.clap) {
-                    this.enemies.push(new _enemyEast2.default(this.canvas.height));
-                    this.clap = this.clap + this.clapVel;
-                }
-                if (this.counter == this.beat) {
-                    this.enemies.push(new _enemySouth2.default(this.canvas.width));
-                    this.beat = this.beat + this.beatVel;
-                }
-                if (this.counter == this.kick) {
-                    this.enemies.push(new _enemyWest2.default(this.canvas.height));
-                    this.kick = this.kick + this.kickVel;
-                }
-                if (this.counter == 4000) {
-                    this.counter = 0; //de counter reset naar 0
-                    this.snare = this.snareStart; //zet elke 4 secondes (maat) de waardes terug naar de beginwaardes
-                    this.clap = this.clapStart;
-                    this.beat = this.beatStart;
-                    this.kick = this.kickStart;
-                }
-            }
-
-            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            this.enemies.forEach(function (enemy) {
-                enemy.move();
-                _this.draw(_this.context, enemy);
-            });
-        }
-    }, {
-        key: "draw",
-        value: function draw(context, enemy) {
-            //context.clearRect(0,0,context.canvas.width,context.canvas.height);
-            context.fillStyle = enemy.props.color;
-            context.fillRect(enemy.props.x, enemy.props.y, enemy.props.width, enemy.props.height);
-        }
-    }, {
-        key: "refresh",
-        value: function refresh() {
-            var _this2 = this;
-
-            this.newEnemy();
-            this.enemies = this.enemies.filter(function (enemy) {
-                return !enemy.props.isDead;
-            });
-
-            window.requestAnimationFrame(function () {
-                _this2.refresh();
-            });
-        }
-    }]);
-
-    return Enemies;
-}();
-
-exports.default = Enemies;
-
-
-var c = new Enemies();
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-//noordelijke enemy
-var EnemyNorth = function () {
-    function EnemyNorth(canvasWidth) {
-        _classCallCheck(this, EnemyNorth);
-
-        this.props = {
-            // type: Math.floor(Math.random() * 4 ),
-            x: canvasWidth / 2,
-            y: 10,
-            width: 10,
-            height: 10,
-            color: this.randomColor(),
-            vel: 2,
-            interval: 2000
-
-        };
-        this.props.x = this.props.x - this.props.width / 2;
-    }
-
-    _createClass(EnemyNorth, [{
-        key: 'randomColor',
-        value: function randomColor() {
-            return 'rgb(' + Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256) + ')';
-        }
-    }, {
-        key: 'move',
-        value: function move() {
-            if (this.props.y > 200) {
-                this.props.isDead = true;
-            }
-            this.props.y += this.props.vel;
-        }
-    }]);
-
-    return EnemyNorth;
-}();
-
-exports.default = EnemyNorth;
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-//noordelijke enemy
-var EnemyEast = function () {
-    function EnemyEast(canvasWidth) {
-        _classCallCheck(this, EnemyEast);
-
-        this.props = {
-            // type: Math.floor(Math.random() * 4 ),
-            x: 390,
-            y: canvasWidth / 2,
-            width: 10,
-            height: 10,
-            color: this.randomColor(),
-            vel: 2,
-            interval: 2000
-
-        };
-        this.props.y = this.props.y - this.props.height / 2;
-    }
-
-    _createClass(EnemyEast, [{
-        key: 'randomColor',
-        value: function randomColor() {
-            return 'rgb(' + Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256) + ')';
-        }
-    }, {
-        key: 'move',
-        value: function move() {
-            if (this.props.x < 200) {
-                this.props.isDead = true;
-            }
-            this.props.x -= this.props.vel;
-        }
-    }]);
-
-    return EnemyEast;
-}();
-
-exports.default = EnemyEast;
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-//noordelijke enemy
-var EnemySouth = function () {
-    function EnemySouth(canvasWidth) {
-        _classCallCheck(this, EnemySouth);
-
-        this.props = {
-            // type: Math.floor(Math.random() * 4 ),
-            x: canvasWidth / 2,
-            y: 390,
-            width: 10,
-            height: 10,
-            color: this.randomColor(),
-            vel: 2,
-            interval: 2000
-
-        };
-        this.props.x = this.props.x - this.props.width / 2;
-    }
-
-    _createClass(EnemySouth, [{
-        key: 'randomColor',
-        value: function randomColor() {
-            return 'rgb(' + Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256) + ')';
-        }
-    }, {
-        key: 'move',
-        value: function move() {
-            if (this.props.y < 200) {
-                this.props.isDead = true;
-            }
-            this.props.y -= this.props.vel;
-        }
-    }]);
-
-    return EnemySouth;
-}();
-
-exports.default = EnemySouth;
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-//noordelijke enemy
-var EnemyWest = function () {
-    function EnemyWest(canvasWidth) {
-        _classCallCheck(this, EnemyWest);
-
-        this.props = {
-            // type: Math.floor(Math.random() * 4 ),
-            x: 10,
-            y: canvasWidth / 2,
-            width: 10,
-            height: 10,
-            color: this.randomColor(),
-            vel: 2,
-            interval: 2000
-
-        };
-        this.props.y = this.props.y - this.props.height / 2;
-    }
-
-    _createClass(EnemyWest, [{
-        key: 'randomColor',
-        value: function randomColor() {
-            return 'rgb(' + Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256) + ')';
-        }
-    }, {
-        key: 'move',
-        value: function move() {
-            if (this.props.x > 200) {
-                this.props.isDead = true;
-            }
-            this.props.x += this.props.vel;
-        }
-    }]);
-
-    return EnemyWest;
-}();
-
-exports.default = EnemyWest;
+throw new Error("Module build failed: SyntaxError: C:/Users/Esther/Documents/CMD/J3/Creative Programming/eindopdracht/src/enemies.es6: Unexpected token (70:12)\n\n\u001b[0m \u001b[90m 68 | \u001b[39m        }\n \u001b[90m 69 | \u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 70 | \u001b[39m        \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mcontext\u001b[33m.\u001b[39mclearRect(\u001b[35m0\u001b[39m\u001b[33m,\u001b[39m\u001b[35m0\u001b[39m\u001b[33m,\u001b[39m\u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mcanvas\u001b[33m.\u001b[39mwidth\u001b[33m,\u001b[39m\u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mcanvas\u001b[33m.\u001b[39mheight)\u001b[33m;\u001b[39m\n \u001b[90m    | \u001b[39m            \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 71 | \u001b[39m        \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39menemies\u001b[33m.\u001b[39mforEach(enemy \u001b[33m=>\u001b[39m {\n \u001b[90m 72 | \u001b[39m            enemy\u001b[33m.\u001b[39mmove()\u001b[33m;\u001b[39m\n \u001b[90m 73 | \u001b[39m            \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mdraw(\u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mcontext\u001b[33m,\u001b[39m enemy)\u001b[33m;\u001b[39m\u001b[0m\n");
 
 /***/ })
 /******/ ]);

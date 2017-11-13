@@ -10,7 +10,9 @@ export default class EnemySouth{
           height: 10,
           color:this.randomColor(),
           vel: 2,
-          interval: 2000
+          direction: 3,
+         // sound: new Audio('../sound/chineseblocks.mp3')
+          
           
         }
         this.props.x = this.props.x - this.props.width/2 ;
