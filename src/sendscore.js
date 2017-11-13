@@ -1,6 +1,7 @@
-var score = 20;
 
-function CallAjaxFunction(serverScript,arguments) 
+export default class AjaxHandler{    
+
+    CallAjaxFunction(serverScript,arguments) 
 { 
     // maak een XMLHttpRequest object aan 
     var xmlHttp = new XMLHttpRequest(); 
@@ -22,14 +23,15 @@ function CallAjaxFunction(serverScript,arguments)
     xmlHttp.send(arguments); 
 } 
 
-function callServer(serverScript) 
+ callServer(serverScript) 
 { 
-    CallAjaxFunction(serverScript,"ding1=" +  +"&ding2=" ); 
+    CallAjaxFunction(serverScript,score); 
 } 
 //afhandelen tonen van de output 
-function handleResult() 
+ handleResult() 
 { 
     // Plaats de output van de AJAXcall binnen een DIV-tag 
     console.log("hoi")
 } 
 
+}

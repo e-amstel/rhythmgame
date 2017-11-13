@@ -6,7 +6,7 @@
 
 import Player from "./player.es6";
 import Enemies from "./enemies.es6";
-
+import AjaxHandler from "./sendscore.js";
 
 class Controller {
     constructor(){

@@ -84,6 +84,10 @@ var _enemies = __webpack_require__(2);
 
 var _enemies2 = _interopRequireDefault(_enemies);
 
+var _sendscore = __webpack_require__(3);
+
+var _sendscore2 = _interopRequireDefault(_sendscore);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -229,6 +233,12 @@ exports.default = Player;
 /***/ (function(module, exports) {
 
 throw new Error("Module build failed: SyntaxError: C:/Users/Esther/Documents/CMD/J3/Creative Programming/eindopdracht/src/enemies.es6: Unexpected token (70:12)\n\n\u001b[0m \u001b[90m 68 | \u001b[39m        }\n \u001b[90m 69 | \u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 70 | \u001b[39m        \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mcontext\u001b[33m.\u001b[39mclearRect(\u001b[35m0\u001b[39m\u001b[33m,\u001b[39m\u001b[35m0\u001b[39m\u001b[33m,\u001b[39m\u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mcanvas\u001b[33m.\u001b[39mwidth\u001b[33m,\u001b[39m\u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mcanvas\u001b[33m.\u001b[39mheight)\u001b[33m;\u001b[39m\n \u001b[90m    | \u001b[39m            \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 71 | \u001b[39m        \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39menemies\u001b[33m.\u001b[39mforEach(enemy \u001b[33m=>\u001b[39m {\n \u001b[90m 72 | \u001b[39m            enemy\u001b[33m.\u001b[39mmove()\u001b[33m;\u001b[39m\n \u001b[90m 73 | \u001b[39m            \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mdraw(\u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mcontext\u001b[33m,\u001b[39m enemy)\u001b[33m;\u001b[39m\u001b[0m\n");
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports) {
+
+throw new Error("Module parse failed: C:\\Users\\Esther\\Documents\\CMD\\J3\\Creative Programming\\eindopdracht\\src\\sendscore.js Binding arguments in strict mode (4:34)\nYou may need an appropriate loader to handle this file type.\n| export default class AjaxHandler{    \r\n| \r\n|     CallAjaxFunction(serverScript,arguments) \r\n| { \r\n|     // maak een XMLHttpRequest object aan \r");
 
 /***/ })
 /******/ ]);
