@@ -11,7 +11,7 @@ export default class EnemyWest{
           color:this.randomColor(),
           vel: 2,
           direction: 4,
-         // sound: new Audio('../sound/sumyungguy.mp3')
+          sound: new Audio('../sound/sumyungguy.mp3')
           
         }
         this.props.y = this.props.y - this.props.height/2 ;

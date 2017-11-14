@@ -11,7 +11,7 @@ export default class EnemySouth{
           color:this.randomColor(),
           vel: 2,
           direction: 3,
-         // sound: new Audio('../sound/chineseblocks.mp3')
+          sound: new Audio('../sound/chineseblocks.mp3')
           
           
         }

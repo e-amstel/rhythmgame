@@ -11,7 +11,7 @@ export default class EnemyEast{
           color:this.randomColor(),
           vel: 2,
           direction: 2,
-        //  sound: new Audio('../sound/tambourinewithhit.mp3') //sounds from http://www.freesfx.co.uk
+          sound: new Audio('../sound/tambourinewithhit.mp3') //sounds from http://www.freesfx.co.uk
                     
           
           
