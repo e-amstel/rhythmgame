@@ -82,9 +82,9 @@ var _enemies = __webpack_require__(2);
 
 var _enemies2 = _interopRequireDefault(_enemies);
 
-var _sendscore = __webpack_require__(7);
+var _ajax = __webpack_require__(7);
 
-var _sendscore2 = _interopRequireDefault(_sendscore);
+var _ajax2 = _interopRequireDefault(_ajax);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -92,20 +92,51 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var Controller = function () {
     function Controller() {
+        var _this = this;
+
         _classCallCheck(this, Controller);
 
+        //canvas inladen
         this.canvas = document.querySelector("#myCanvas");
         this.context = this.canvas.getContext("2d");
-
+        //buttons 
+        this.startButton = document.getElementById("StartButton");
+        this.scoreButton = document.getElementById("ScoreButton");
+        this.nextLevel = document.getElementById("NextLevel");
+        //level-relevante data
         this.score = 0;
+        this.level = 1;
+        this.maxLevel = 4; //het maximaal aantal levels. Hier nog gehardcode, maar zou kunnen veranderen op basis van het aantal rows in de leveltabel
+        this.levelData = 0; //een leeg object om de leveldata in te laden
+        this.levelUp = false;
 
         this.player = new _player2.default();
-        this.ajaxHandler = new _sendscore2.default();
+        this.ajaxHandler = new _ajax2.default();
         this.enemyController = new _enemies2.default();
+        //is het nummer al begonnen? songstart staat standaard op false
+        this.songstart = false;
+        //gegevens voor achtergrondmuziek en achtergrondafbeelding
+        this.bgmusic = new Audio('./sound/chineseorcestra.mp3');
+        this.bgimg = new Image();
+        this.bgimg.src = "./img/sakura.jpg";
 
-        this.songstart = true; //is het nummer al begonnen? op het moment nog niks mee gedaan maar geeft mogelijkheid tot het inbouwen van een start knop
-
-        this.bgmusic = new Audio('../sound/chineseorcestra.mp3');
+        this.startButton.onclick = function () {
+            //als er op de startbutton wordt geklikt, activeer startfunctie
+            _this.start();
+        };
+        this.nextLevel.onclick = function () {
+            //  this.level++; //een level hoger
+            //  if (this.level > this.maxLevel){ //reset level naar 1 als hij hoger wordt dan het aantal levels komt
+            //      this.level = 1;
+            //      alert("You win! Please save your score");
+            //  }
+            //  this.start();
+        };
+        this.scoreButton.onclick = function () {
+            //als er op de scorebutton wordt geklikt, 
+            _this.ajaxHandler.CallAjaxFunction(_this.score); //activeer de functie om score naar database te sturen
+            location.reload(); //en herlaad de pagina
+        };
 
         this.refresh();
     }
@@ -113,37 +144,73 @@ var Controller = function () {
     _createClass(Controller, [{
         key: "start",
         value: function start() {
-            this.bgmusic.play();
-            this.songstart = true;
+            this.bgmusic.play(); //achtergrondmuziek
+            this.songstart = true; //start het liedje 
+            this.loadSong();
         }
     }, {
-        key: "writescore",
-        value: function writescore() {
+        key: "loadSong",
+        value: function loadSong() {
+            this.ajaxHandler.loadSong(this.level); //laad level data
+            this.levelData = this.ajaxHandler.songData(); //de leveldata wordt gereturned naar levelData
+            this.enemyController.songData( //stuur de leveldata naar de enemycontroller om daar de functie songdata te vullen
+            this.levelData.north, this.levelData.northvel, this.levelData.east, this.levelData.eastvel, this.levelData.south, this.levelData.southvel, this.levelData.west, this.levelData.westvel, this.levelData.songduration);
+        }
+    }, {
+        key: "writeScore",
+        value: function writeScore() {
+            //schrijf de score en level rechtsbovenin
             this.context.font = "14px Arial";
             this.context.textAlign = "right";
             this.context.fillText("Score: " + this.score, this.canvas.width, 50);
+            this.context.fillText("Level: " + this.level, this.canvas.width, 30);
+        }
+    }, {
+        key: "startScreen",
+        value: function startScreen() {
+            this.context.drawImage(this.bgimg, 10, 10); //teken de background
+            this.context.font = "30px Arial";
+            this.context.fillText("Defeat your enemies!", 50, 220);
+            this.context.fillText("Tap W, A, S and D", 60, 320);
+        }
+    }, {
+        key: "nextLevelCheck",
+        value: function nextLevelCheck() {
+            this.levelUp = this.enemyController.nextLevelCheck();
+            console.log(this.levelUp);
+            if (this.levelUp) {
+                this.level++; //een level hoger
+                if (this.level > this.maxLevel) {
+                    //reset level naar 1 als hij hoger wordt dan het aantal levels komt
+                    this.level = 1;
+                    alert("You win! Please save your score");
+                }
+                this.start();
+            }
         }
     }, {
         key: "refresh",
         value: function refresh() {
-            var _this = this;
+            var _this2 = this;
 
-            if (this.songstart == true) {
+            this.startScreen(); //tekent de bg en schrijft de tekst
+
+
+            if (this.songstart) {
+                this.enemyController.newEnemy();
 
                 this.player.draw(this.context); //tekenen speler op canvas
 
                 this.enemyController.collide(this.player); //parameters voor PLAYER en SCORE
-                this.score = this.enemyController.showScore();
-                this.writescore();
-            }
-
-            if (this.songstart == false) {
-                this.ajaxHandler.CallAjaxFunction(this.score);
+                this.score = this.enemyController.showScore(); //showscore returnt de score als gegenereerd in enemies
+                this.writeScore(); //schrijf de score
+                this.enemyController.writeTimeLeft(this.context); //writetimeleft schrijft de tijd die over is in het level
+                this.nextLevelCheck(); //checkt of het nieuwe level geladen moet worden
             }
 
             window.requestAnimationFrame(function () {
                 //elke animation frame de functie opnieuw uitvoeren
-                _this.refresh();
+                _this2.refresh();
             });
         }
     }]);
@@ -180,10 +247,15 @@ var Player = function () {
             //   width: 100,
             //   height: 100,
             r: 60, //radius van de playercirkel, deze kan vergroot en verkleind gaan worden om het spel moeilijker te maken
-            color: this.randomColor(),
+            color: " #000033",
             linewidth: 3,
-            keydown: 0
+            keydown: 0,
+            img: new Image(),
+            imgX: 50,
+            imgY: 50
         };
+        this.props.img.src = "../img/blue-ninja.png";
+
         window.addEventListener("keydown", function (e) {
             if (e.keyCode == 87) {
                 //w key
@@ -220,12 +292,9 @@ var Player = function () {
             context.lineWidth = this.props.linewidth;
             context.strokeStyle = this.props.color;
             context.stroke();
+            context.drawImage(this.props.img, this.props.x - this.props.imgX / 2, this.props.y - this.props.imgY / 2);
+
             // context.fill();
-        }
-    }, {
-        key: "randomColor",
-        value: function randomColor() {
-            return 'rgb(' + Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256) + ')';
         }
     }, {
         key: "refresh",
@@ -294,22 +363,27 @@ var Enemies = function () {
         //dat betekent dat de interval constant blijft
         //hier is een derde variabele aan toegevoegd
         //om een veranderende afstand tussen de blokjes te bepalen
-        //de counter is 60 fps
-        this.north = 500; //beginwaarde interval
+        //de waardes zijn gevuld met standaardwaardes, maar worden later in de functie songdata gevuld met juiste waarden
+        this.north = 100; //beginwaarde interval
         this.northStart = 100; //statische resetwaarde
         this.northVel = 100; //toenemende waarde 
-        this.east = 1000;
+        this.east = 120;
         this.eastStart = 120;
         this.eastVel = 120;
         this.south = 60;
         this.southStart = 60;
         this.southVel = 60;
-        this.west = 120;
+        this.west = 90;
         this.westStart = 90;
         this.westVel = 90;
 
+        //de counter is 60 fps
+
         this.counter = 0;
         this.songduration = 3000;
+
+        //een variabele om te meten of het level geeindigd is
+        this.levelEnd = false;
 
         this.score = 0;
 
@@ -317,6 +391,24 @@ var Enemies = function () {
     }
 
     _createClass(Enemies, [{
+        key: "songData",
+        value: function songData( //de functie songdata wijst de juiste data toe
+        north, northvel, east, eastvel, south, southvel, west, westvel, songduration) {
+            //omdat de output van de array als strings komt, parse de waarden naar int
+            this.north = parseInt(north); //beginwaarde interval
+            this.northVel = parseInt(northvel); //toenemende waarde 
+            this.east = parseInt(east);
+            this.eastVel = parseInt(eastvel);
+            this.south = parseInt(south);
+            this.southVel = parseInt(southvel);
+            this.west = parseInt(west);
+            this.westVel = parseInt(westvel);
+
+            this.songduration = songduration;
+
+            this.counter = 0;
+        }
+    }, {
         key: "newEnemy",
         value: function newEnemy() {
             var _this = this;
@@ -343,45 +435,45 @@ var Enemies = function () {
                 this.enemies.push(new _enemyWest2.default(this.canvas.height));
                 this.west = this.west + this.westVel;
             }
-            if (this.counter == 4000) {
-                this.counter = 0; //de counter reset naar 0
-                this.north = this.northStart; //zet elke 4 secondes (maat) de waardes terug naar de beginwaardes
-                this.east = this.eastStart;
-                this.south = this.southStart;
-                this.west = this.westStart;
-            }
+            this.levelEnd = false; //reset de levelEnd variabele naar false
 
-            if (this.counter == this.songduration) {
-                // alert("THE END!");
-                document.location.reload();
-            }
-
-            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height); //clear het canvas
             this.enemies.forEach(function (enemy) {
-                enemy.move();
-                _this.draw(_this.context, enemy);
+                //voor elke enemy
+                enemy.move(); //verander de positie van de enemy
+                _this.draw(_this.context, enemy); //teken de enemy
             });
+        }
+    }, {
+        key: "nextLevelCheck",
+        value: function nextLevelCheck() {
+            if (this.counter == this.songduration) {
+                this.counter = 0; //counter reset naar 0
+                this.levelEnd = true; //is het level geeindigd?
+                return this.levelEnd; //stuur de levelendwaarde naar script.js
+            }
+        }
+    }, {
+        key: "writeTimeLeft",
+        value: function writeTimeLeft(context) {
+            //schrijf de liedjesduur-counter=tijd die over is
+            context.font = "14px Arial";
+            context.fillText("Time Left: " + Math.floor((this.songduration - this.counter) / 60), this.canvas.width, 70);
         }
     }, {
         key: "draw",
         value: function draw(context, enemy) {
-            //context.clearRect(0,0,context.canvas.width,context.canvas.height);
-            context.fillStyle = enemy.props.color;
-            context.fillRect(enemy.props.x, enemy.props.y, enemy.props.width, enemy.props.height);
+            context.drawImage(enemy.props.img, enemy.props.x, enemy.props.y); //teken het plaatje
         }
     }, {
         key: "collide",
         value: function collide(player) {
             var _this2 = this;
 
-            //collide in enemies met parameter voor player en parameter voor de score
+            //collide in enemies met parameter voor player en parameter voor de score  ((kan ook alleen player props))
             this.enemies.forEach(function (enemy) {
                 //voor elke enemy meten 
                 //als enemy x of y tussen player x of y en player x of y -radius: collision      
-                //elke collisionwordt gemeten als meerdere collisions, 
-                //een exacte score zou dus berekend kunnen worden door het aantal collisions door 16 te delen    
-                //een eerlijke score (die in verhouding staat met de moeilijkheidsgraad) kan bereikt worden 
-                //door het delen van de collisions door de radius en dit af te ronden of te vermenigvuldigen met een standaard getal 
                 if (enemy.props.y > player.props.y - player.props.r && enemy.props.y < player.props.y && enemy.props.direction == 1) {
                     //collide top
                     //als juiste key ingedrukt
@@ -401,8 +493,6 @@ var Enemies = function () {
                         enemy.props.sound.play();
                         enemy.props.isDead = true;
                         _this2.score++;
-
-                        //speel geluidje
                     }
                 }
                 if (enemy.props.y < player.props.y + player.props.r && enemy.props.y > player.props.y && enemy.props.direction == 3) {
@@ -412,8 +502,6 @@ var Enemies = function () {
                         enemy.props.sound.play();
                         enemy.props.isDead = true;
                         _this2.score++;
-
-                        //speel geluidje
                     }
                 }
                 if (enemy.props.x < player.props.x + player.props.r && enemy.props.x > player.props.x && enemy.props.direction == 2) {
@@ -423,11 +511,8 @@ var Enemies = function () {
                         enemy.props.sound.play();
                         enemy.props.isDead = true;
                         _this2.score++;
-
-                        //speel geluidje
                     }
                 }
-                //  console.log(this.score);
             });
         }
     }, {
@@ -440,7 +525,6 @@ var Enemies = function () {
         value: function refresh() {
             var _this3 = this;
 
-            this.newEnemy();
             this.enemies = this.enemies.filter(function (enemy) {
                 return !enemy.props.isDead;
             });
@@ -455,9 +539,6 @@ var Enemies = function () {
 }();
 
 exports.default = Enemies;
-
-
-var c = new Enemies();
 
 /***/ }),
 /* 3 */
@@ -481,16 +562,18 @@ var EnemyNorth = function () {
 
         this.props = {
             // type: Math.floor(Math.random() * 4 ),
-            x: canvasWidth / 2,
+            x: canvasWidth / 2 - 15,
             y: 10,
             width: 10,
             height: 10,
             color: this.randomColor(),
             vel: 2, //snelheid van de enemy, kan increased worden
             direction: 1,
-            sound: new Audio('../sound/sword.mp3')
+            sound: new Audio('../sound/sword.mp3'),
+            img: new Image()
         };
         this.props.x = this.props.x - this.props.width / 2;
+        this.props.img.src = "../img/ninja-north.png";
     }
 
     _createClass(EnemyNorth, [{
@@ -536,17 +619,18 @@ var EnemyEast = function () {
         this.props = {
             // type: Math.floor(Math.random() * 4 ),
             x: 390,
-            y: canvasWidth / 2,
+            y: canvasWidth / 2 - 15,
             width: 10,
             height: 10,
             color: this.randomColor(),
             vel: 2,
             direction: 2,
-            sound: new Audio('../sound/tambourinewithhit.mp3') //sounds from http://www.freesfx.co.uk
-
+            sound: new Audio('../sound/tambourinewithhit.mp3'), //sounds from http://www.freesfx.co.uk
+            img: new Image()
 
         };
         this.props.y = this.props.y - this.props.height / 2;
+        this.props.img.src = "../img/ninja-east.png";
     }
 
     _createClass(EnemyEast, [{
@@ -591,17 +675,19 @@ var EnemySouth = function () {
 
         this.props = {
             // type: Math.floor(Math.random() * 4 ),
-            x: canvasWidth / 2,
+            x: canvasWidth / 2 - 15,
             y: 390,
             width: 10,
             height: 10,
             color: this.randomColor(),
             vel: 2,
             direction: 3,
-            sound: new Audio('../sound/chineseblocks.mp3')
+            sound: new Audio('../sound/chineseblocks.mp3'),
+            img: new Image()
 
         };
         this.props.x = this.props.x - this.props.width / 2;
+        this.props.img.src = "../img/ninja-south.png";
     }
 
     _createClass(EnemySouth, [{
@@ -647,16 +733,18 @@ var EnemyWest = function () {
         this.props = {
             // type: Math.floor(Math.random() * 4 ),
             x: 10,
-            y: canvasWidth / 2,
+            y: canvasWidth / 2 - 15,
             width: 10,
             height: 10,
             color: this.randomColor(),
             vel: 2,
             direction: 4,
-            sound: new Audio('../sound/sumyungguy.mp3')
+            sound: new Audio('../sound/sumyungguy.mp3'),
+            img: new Image()
 
         };
         this.props.y = this.props.y - this.props.height / 2;
+        this.props.img.src = "../img/ninja-west.png";
     }
 
     _createClass(EnemyWest, [{
@@ -697,6 +785,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var AjaxHandler = function () {
     function AjaxHandler() {
         _classCallCheck(this, AjaxHandler);
+
+        this.xhttpSong = new XMLHttpRequest();
+        this.levelData = 0;
     }
 
     _createClass(AjaxHandler, [{
@@ -734,6 +825,28 @@ var AjaxHandler = function () {
             // Plaats de output van de AJAXcall binnen een DIV-tag 
             console.log("hoi");
             console.log(score);
+        }
+    }, {
+        key: "loadSong",
+        value: function loadSong(level) {
+            var _this2 = this;
+
+            this.xhttpSong.onreadystatechange = function () {
+                if (_this2.xhttpSong.readyState == 4 && _this2.xhttpSong.status == 200) {
+                    // Typical action to be performed when the document is ready:
+                    // console.log(JSON.parse(this.xhttpSong.responseText));
+                    _this2.levelData = JSON.parse(_this2.xhttpSong.responseText);
+                    _this2.songData();
+                }
+            };
+            this.xhttpSong.open("GET", "http://emamstel.acue.webpages.avans.nl/cp/src/loadSongs.php/?level=" + level, true);
+            this.xhttpSong.send();
+        }
+    }, {
+        key: "songData",
+        value: function songData() {
+            // console.log(JSON.parse(this.levelData));
+            return this.levelData;
         }
     }]);
 

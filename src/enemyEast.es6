@@ -5,18 +5,20 @@ export default class EnemyEast{
         this.props = {
          // type: Math.floor(Math.random() * 4 ),
           x: 390,
-          y: canvasWidth/2,
+          y: canvasWidth/2 -15,
           width: 10,
           height: 10,
           color:this.randomColor(),
           vel: 2,
           direction: 2,
-          sound: new Audio('../sound/tambourinewithhit.mp3') //sounds from http://www.freesfx.co.uk
-                    
+          sound: new Audio('../sound/tambourinewithhit.mp3'), //sounds from http://www.freesfx.co.uk
+          img: new Image(),
+          
           
           
         }
         this.props.y = this.props.y - this.props.height/2 ;
+        this.props.img.src = "../img/ninja-east.png";
         
 
       }

@@ -7,12 +7,11 @@ export default class Player{
         //   width: 100,
         //   height: 100,
           r: 60, //radius van de playercirkel, deze kan vergroot en verkleind gaan worden om het spel moeilijker te maken
-          color:" #000033",
+          color:this.randomColor(),
           linewidth: 3,
           keydown: 0,  
           img: new Image(),
-          imgX: 50,
-          imgY: 50
+          
         };
         this.props.img.src = "../img/blue-ninja.png";
         
@@ -51,11 +50,16 @@ export default class Player{
            context.lineWidth = this.props.linewidth;
            context.strokeStyle = this.props.color;
            context.stroke();
-           context.drawImage(this.props.img, this.props.x-this.props.imgX/2, this.props.y-this.props.imgY/2);
+           context.drawImage(this.props.img, this.props.x, this.props.y);
            
           // context.fill();
        }
        
+       randomColor() {
+        return 'rgb(' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ')';
+    }
+
+
         refresh(){
 
             // this.context.clearRect(0,0,this.canvas.width,this.canvas.height);

@@ -35,9 +35,6 @@ export default class Enemies {
         this.counter = 0; 
         this.songduration = 3000;
 
-        //een variabele om te meten of het level geeindigd is
-        this.levelEnd = false;
-        
         this.score = 0;
         
         this.refresh();
@@ -92,20 +89,16 @@ export default class Enemies {
                 this.enemies.push(new EnemyWest(this.canvas.height));  
                 this.west = this.west+this.westVel;
             }
-            this.levelEnd = false; //reset de levelEnd variabele naar false
-            
+             if (this.counter == this.songduration){ 
+                alert("You win! Please save your score");
+                this.counter = 0; //counter reset naar 0
+                
+             }
        this.context.clearRect(0,0,this.canvas.width,this.canvas.height); //clear het canvas
         this.enemies.forEach(enemy => { //voor elke enemy
             enemy.move(); //verander de positie van de enemy
             this.draw(this.context, enemy); //teken de enemy
         })
-    }
-    nextLevelCheck(){
-        if (this.counter == this.songduration){ 
-            this.counter = 0; //counter reset naar 0
-            this.levelEnd = true; //is het level geeindigd?
-            return this.levelEnd; //stuur de levelendwaarde naar script.js
-        }
     }
     writeTimeLeft(context){ //schrijf de liedjesduur-counter=tijd die over is
         context.font = "14px Arial";
@@ -116,7 +109,7 @@ export default class Enemies {
             context.drawImage(enemy.props.img, enemy.props.x, enemy.props.y); //teken het plaatje
        }
     
-       collide(player){ //collide in enemies met parameter voor player en parameter voor de score  ((kan ook alleen player props))
+       collide(player){ //collide in enemies met parameter voor player en parameter voor de score
         this.enemies.forEach(enemy => { //voor elke enemy meten 
             //als enemy x of y tussen player x of y en player x of y -radius: collision      
             if (enemy.props.y > (player.props.y - player.props.r) && enemy.props.y < player.props.y && enemy.props.direction == 1){
@@ -181,3 +174,4 @@ export default class Enemies {
 
 }
 
+var c = new Enemies();

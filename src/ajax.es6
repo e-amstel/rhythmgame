@@ -1,6 +1,8 @@
 
 export default class AjaxHandler{
     constructor(){
+        this.xhttpSong = new XMLHttpRequest();
+        this.levelData = 0;
     }    
 
     CallAjaxFunction(score) 
@@ -37,5 +39,23 @@ export default class AjaxHandler{
         
     }   
 
+    loadSong(level){
+        this.xhttpSong.onreadystatechange = ()=> {
+            if (this.xhttpSong.readyState == 4 && this.xhttpSong.status == 200) {
+                // Typical action to be performed when the document is ready:
+               // console.log(JSON.parse(this.xhttpSong.responseText));
+               this.levelData = JSON.parse(this.xhttpSong.responseText);
+               this.songData();
+            }
+        };
+        this.xhttpSong.open("GET",
+            "http://emamstel.acue.webpages.avans.nl/cp/src/loadSongs.php/?level=" + level, true);
+        this.xhttpSong.send();
+        }
 
+    songData(){
+       // console.log(JSON.parse(this.levelData));
+        return (this.levelData); 
+        
+    }    
 }

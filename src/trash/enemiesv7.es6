@@ -35,9 +35,6 @@ export default class Enemies {
         this.counter = 0; 
         this.songduration = 3000;
 
-        //een variabele om te meten of het level geeindigd is
-        this.levelEnd = false;
-        
         this.score = 0;
         
         this.refresh();
@@ -92,33 +89,35 @@ export default class Enemies {
                 this.enemies.push(new EnemyWest(this.canvas.height));  
                 this.west = this.west+this.westVel;
             }
-            this.levelEnd = false; //reset de levelEnd variabele naar false
-            
-       this.context.clearRect(0,0,this.canvas.width,this.canvas.height); //clear het canvas
-        this.enemies.forEach(enemy => { //voor elke enemy
-            enemy.move(); //verander de positie van de enemy
-            this.draw(this.context, enemy); //teken de enemy
+
+        this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
+        this.enemies.forEach(enemy => {
+            enemy.move();
+            this.draw(this.context, enemy);
         })
     }
-    nextLevelCheck(){
-        if (this.counter == this.songduration){ 
-            this.counter = 0; //counter reset naar 0
-            this.levelEnd = true; //is het level geeindigd?
-            return this.levelEnd; //stuur de levelendwaarde naar script.js
-        }
-    }
-    writeTimeLeft(context){ //schrijf de liedjesduur-counter=tijd die over is
+    writeTimeLeft(context){
         context.font = "14px Arial";
         context.fillText("Time Left: "+ Math.floor((this.songduration - this.counter)/60),this.canvas.width, 70);
     }
 
     draw(context, enemy){
-            context.drawImage(enemy.props.img, enemy.props.x, enemy.props.y); //teken het plaatje
+           //context.clearRect(0,0,context.canvas.width,context.canvas.height);
+           context.fillStyle = enemy.props.color;
+           context.fillRect(
+               enemy.props.x, 
+               enemy.props.y, 
+               enemy.props.width, 
+               enemy.props.height);
        }
     
-       collide(player){ //collide in enemies met parameter voor player en parameter voor de score  ((kan ook alleen player props))
+       collide(player){ //collide in enemies met parameter voor player en parameter voor de score
         this.enemies.forEach(enemy => { //voor elke enemy meten 
             //als enemy x of y tussen player x of y en player x of y -radius: collision      
+            //elke collisionwordt gemeten als meerdere collisions, 
+            //een exacte score zou dus berekend kunnen worden door het aantal collisions door 16 te delen    
+            //een eerlijke score (die in verhouding staat met de moeilijkheidsgraad) kan bereikt worden 
+            //door het delen van de collisions door de radius en dit af te ronden of te vermenigvuldigen met een standaard getal 
             if (enemy.props.y > (player.props.y - player.props.r) && enemy.props.y < player.props.y && enemy.props.direction == 1){
                //collide top
                  //als juiste key ingedrukt
@@ -181,3 +180,4 @@ export default class Enemies {
 
 }
 
+var c = new Enemies();

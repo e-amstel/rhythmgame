@@ -5,16 +5,18 @@ export default class EnemyWest{
         this.props = {
          // type: Math.floor(Math.random() * 4 ),
           x: 10,
-          y: canvasWidth/2 ,
+          y: canvasWidth/2 -15,
           width: 10,
           height: 10,
           color:this.randomColor(),
           vel: 2,
           direction: 4,
-          sound: new Audio('../sound/sumyungguy.mp3')
+          sound: new Audio('../sound/sumyungguy.mp3'),
+          img: new Image(),
           
         }
         this.props.y = this.props.y - this.props.height/2 ;
+        this.props.img.src = "../img/ninja-west.png";
         
 
       }

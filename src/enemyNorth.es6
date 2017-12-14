@@ -4,17 +4,19 @@ export default class EnemyNorth{
     constructor(canvasWidth){
         this.props = {
          // type: Math.floor(Math.random() * 4 ),
-          x: canvasWidth/2 ,
+          x: canvasWidth/2 - 15 ,
           y: 10,
           width: 10,
           height: 10,
           color:this.randomColor(),
           vel: 2, //snelheid van de enemy, kan increased worden
           direction: 1,
-          sound: new Audio('../sound/sword.mp3')
+          sound: new Audio('../sound/sword.mp3'),
+          img: new Image(),
         }
         this.props.x = this.props.x - this.props.width/2 ;
-
+        this.props.img.src = "../img/ninja-north.png";
+        
       }
 
        randomColor() {
